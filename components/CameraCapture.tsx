@@ -164,6 +164,12 @@ export default function CameraCapture({ onCapture, onCancel }: CameraCaptureProp
               muted
               className="max-w-full max-h-96 rounded-lg shadow-lg bg-black -scale-x-100"
             />
+            {isStreaming && (
+              <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute left-1/2 top-[11%] -translate-x-1/2 w-[35%] h-[35%] rounded-full border-[6px] border-dashed border-orange-400/95" />
+                <div className="absolute left-1/2 top-[38%] -translate-x-1/2 w-[78%] h-[58%] rounded-[45%] border-[6px] border-dashed border-orange-400/95" />
+              </div>
+            )}
             {!isStreaming && (
               <div className="absolute inset-0 flex items-center justify-center bg-gray-900 rounded-lg">
                 <div className="text-white text-center">
@@ -191,7 +197,7 @@ export default function CameraCapture({ onCapture, onCancel }: CameraCaptureProp
             </button>
           </div>
           <p className="text-sm text-black text-center">
-            밝은 곳에서 촬영하면 더 정확한 결과를 얻을 수 있습니다.
+            안내선 안에 얼굴과 어깨가 들어오게 맞춰 촬영해주세요. 너무 가까우면 인식이 어려울 수 있습니다.
           </p>
         </>
       )}

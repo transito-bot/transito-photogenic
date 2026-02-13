@@ -35,23 +35,23 @@ const GRADE_THRESHOLDS: Record<Grade, { min: number; max: number }> = {
 const GRADE_INFO: Record<Grade, { name: string; message: string }> = {
   range_0_20: {
     name: '진실의 직시',
-    message: '🥹 보정 좀 하세요. 너무 솔직해서 AI도 걱정 중입니다.',
+    message: '🥹 보정 좀 하세요.\n너무 솔직해서 AI도 걱정 중입니다.',
   },
   range_21_35: {
     name: '보정 입문',
-    message: '👏 이 정도는 현대인의 미덕이죠! 어디가서 난 보정 안 해! 말해도 됩니다.',
+    message: '👏 이 정도는 현대인의 미덕이죠!\n어디가서 난 보정 안 해! 말해도 됩니다.',
   },
   range_36_47: {
     name: '프로의 손길',
-    message: '😏 딱 여기까지가 마지노선! 소개팅 상대도 첫눈에 알아볼 수 있어요',
+    message: '😏 딱 여기까지가 마지노선!\n소개팅 상대도 첫눈에 알아볼 수 있어요',
   },
   range_48_61: {
     name: '쌍꺼풀 추적',
-    message: '🗣️ 친구들은 당신이 보정빨이라 생각하고 있어요!',
+    message: '🗣️ 친구들은 당신이\n보정빨이라 생각하고 있어요!',
   },
   range_62_75: {
     name: 'Adobe 우수고객',
-    message: '🤥 혹시 인플루언서세요? 당신의 보정 실력 저도 학습하고 싶네요!',
+    message: '🤥 혹시 인플루언서세요?\n당신의 보정 실력 저도 학습하고 싶네요!',
   },
   range_76_85: {
     name: '증명사진 갱신 불가',
@@ -59,7 +59,7 @@ const GRADE_INFO: Record<Grade, { name: string; message: string }> = {
   },
   range_86_100: {
     name: '형사수사 합격',
-    message: '🚨 사기죄로 고소당할 뻔.\n소개팅 상대가 경찰 신고를 고민 중이라\n변호사 선임 권유드립니다.',
+    message: '🚨 사기죄로 고소당할 뻔.\n소개팅 상대가 경찰 신고를\n고민 중이라 변호사 선임 권유드립니다.',
   },
 };
 

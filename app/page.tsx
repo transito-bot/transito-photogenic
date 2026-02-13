@@ -195,7 +195,7 @@ export default function Home() {
               <h2 className="text-2xl font-semibold text-black">Step 1: 즉석 셀카 촬영</h2>
             </div>
             <p className="text-black mb-6">
-              카메라로 보정 없는 즉석 셀카를 촬영해주세요. 밝은 곳에서 촬영하면 더 정확한 결과를 얻을 수 있습니다.
+              카메라로 즉석 셀카를 촬영해주세요. 안내선에 맞춰서 촬영하면 더 정확한 결과를 얻을 수 있습니다.
             </p>
             <CameraCapture onCapture={handleOriginalCapture} />
           </div>
@@ -209,7 +209,8 @@ export default function Home() {
               <h2 className="text-2xl font-semibold text-black">Step 2: 보정본 업로드</h2>
             </div>
             <p className="text-black mb-6">
-              갤러리에서 보정된 인생샷을 선택해주세요.
+              갤러리에서 사진을 선택해주세요.<br />
+              (최대한 정면 사진으로 선택해주세요)
             </p>
             <ImageUpload onUpload={handleEditedUpload} />
             <div className="mt-4 flex justify-center">
