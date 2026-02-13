@@ -1,9 +1,8 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { ScoreResult, getScoreColor, getGradeBadgeColor } from '@/lib/score';
+import { ScoreResult, getGradeBadgeColor } from '@/lib/score';
 import { FaceDetection } from '@/lib/face-api';
-import * as faceapi from 'face-api.js';
 import ShareButton from './ShareButton';
 
 interface ResultDisplayProps {
@@ -151,7 +150,7 @@ export default function ResultDisplay({
     <div className="flex flex-col items-center gap-6 p-6 bg-white rounded-lg shadow-lg">
       {/* 점수 및 등급 */}
       <div className="text-center">
-        <div className={`text-6xl font-bold mb-2 ${getScoreColor(scoreResult.score)}`}>
+        <div className="text-6xl font-bold mb-2 text-black">
           {scoreResult.score}점
         </div>
         <div
@@ -159,7 +158,9 @@ export default function ResultDisplay({
         >
           {scoreResult.gradeName}
         </div>
-        <p className="mt-4 text-lg text-black whitespace-pre-line">{scoreResult.message}</p>
+        <p className="mt-4 text-lg text-black whitespace-pre-line">
+          {scoreResult.message}
+        </p>
       </div>
 
       {/* 이미지 비교 */}
