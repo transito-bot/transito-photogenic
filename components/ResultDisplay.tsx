@@ -154,7 +154,7 @@ export default function ResultDisplay({
           {scoreResult.score}점
         </div>
         <div
-          className={`inline-block px-4 py-2 rounded-full border-2 font-semibold ${getGradeBadgeColor(scoreResult.grade)}`}
+          className={`inline-block px-4 py-2 rounded-full border-2 font-semibold shadow-sm ${getGradeBadgeColor(scoreResult.grade)}`}
         >
           {scoreResult.gradeName}
         </div>

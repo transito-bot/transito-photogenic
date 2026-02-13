@@ -142,18 +142,18 @@ export function getScoreColor(score: number): string {
 export function getGradeBadgeColor(grade: Grade): string {
   switch (grade) {
     case 'range_0_20':
-      return 'bg-green-100 text-green-800 border-green-300';
+      return 'bg-emerald-600 text-white border-emerald-700';
     case 'range_21_35':
-      return 'bg-emerald-100 text-emerald-800 border-emerald-300';
+      return 'bg-green-600 text-white border-green-700';
     case 'range_36_47':
-      return 'bg-sky-100 text-sky-800 border-sky-300';
+      return 'bg-cyan-600 text-white border-cyan-700';
     case 'range_48_61':
-      return 'bg-blue-100 text-blue-800 border-blue-300';
+      return 'bg-blue-600 text-white border-blue-700';
     case 'range_62_75':
-      return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      return 'bg-yellow-300 text-black border-yellow-500';
     case 'range_76_85':
-      return 'bg-orange-100 text-orange-800 border-orange-300';
+      return 'bg-orange-500 text-white border-orange-700';
     case 'range_86_100':
-      return 'bg-red-100 text-red-800 border-red-300';
+      return 'bg-red-600 text-white border-red-700';
   }
 }
