@@ -109,7 +109,7 @@ export default function ImageUpload({
           </button>
           <button
             onClick={handleRemove}
-            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
+            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors"
           >
             다시 선택
           </button>
@@ -128,7 +128,7 @@ export default function ImageUpload({
 
   return (
     <div className="w-full">
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+      <label className="block text-sm font-medium text-black mb-2">
         {label}
       </label>
       <div
@@ -154,15 +154,15 @@ export default function ImageUpload({
           className="hidden"
         />
         <div className="flex flex-col items-center gap-3">
-          <ImageIcon 
+            <ImageIcon 
             size={48} 
-            className={isDragging ? 'text-blue-500' : 'text-gray-400'} 
+            className={isDragging ? 'text-blue-500' : 'text-black'} 
           />
           <div>
-            <p className="text-gray-700 font-medium">
+            <p className="text-black font-medium">
               {isDragging ? '여기에 이미지를 놓으세요' : '이미지를 드래그하거나 클릭하세요'}
             </p>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-black mt-1">
               JPG, PNG, WEBP (최대 10MB)
             </p>
           </div>

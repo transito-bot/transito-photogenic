@@ -159,12 +159,7 @@ export default function ResultDisplay({
         >
           {scoreResult.gradeName}
         </div>
-        <p className="mt-4 text-lg text-gray-700">{scoreResult.message}</p>
-        {scoreResult.filterBonus > 0 && (
-          <p className="mt-2 text-sm text-gray-500">
-            필터 보너스: +{scoreResult.filterBonus}점
-          </p>
-        )}
+        <p className="mt-4 text-lg text-black whitespace-pre-line">{scoreResult.message}</p>
       </div>
 
       {/* 이미지 비교 */}
@@ -172,7 +167,7 @@ export default function ResultDisplay({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-4xl">
           {originalImageUrl && (
             <div className="flex flex-col items-center">
-              <h3 className="text-sm font-medium text-gray-700 mb-2">원본 (즉석 셀카)</h3>
+              <h3 className="text-sm font-medium text-black mb-2">원본 (즉석 셀카)</h3>
               <div className="relative inline-block">
                 <img
                   src={originalImageUrl}
@@ -191,7 +186,7 @@ export default function ResultDisplay({
           )}
           {editedImageUrl && (
             <div className="flex flex-col items-center">
-              <h3 className="text-sm font-medium text-gray-700 mb-2">보정본</h3>
+              <h3 className="text-sm font-medium text-black mb-2">보정본</h3>
               <div className="relative inline-block">
                 <img
                   src={editedImageUrl}
@@ -214,8 +209,6 @@ export default function ResultDisplay({
       {/* 공유 버튼 */}
       <ShareButton
         scoreResult={scoreResult}
-        originalImageUrl={originalImageUrl}
-        editedImageUrl={editedImageUrl}
       />
     </div>
   );

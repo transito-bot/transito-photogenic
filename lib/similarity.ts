@@ -146,11 +146,69 @@ function calculateNoseSizeSimilarity(
 }
 
 /**
+ * 얼굴 descriptor 거리(동일인 판별용)를 계산합니다.
+ * distance가 클수록 서로 다른 사람일 가능성이 높습니다.
+ */
+export function calculateDescriptorDistance(
+  descriptor1?: Float32Array,
+  descriptor2?: Float32Array
+): number | null {
+  if (!descriptor1 || !descriptor2 || descriptor1.length !== descriptor2.length) {
+    return null;
+  }
+
+  let sum = 0;
+  for (let i = 0; i < descriptor1.length; i++) {
+    const diff = descriptor1[i] - descriptor2[i];
+    sum += diff * diff;
+  }
+
+  return Math.sqrt(sum);
+}
+
+/**
+ * 얼굴 descriptor 거리(동일인 판별용)를 유사도로 변환합니다.
+ */
+function calculateDescriptorSimilarity(
+  descriptor1?: Float32Array,
+  descriptor2?: Float32Array
+): number | null {
+  const distance = calculateDescriptorDistance(descriptor1, descriptor2);
+  if (distance === null) {
+    return null;
+  }
+
+  // 0.6 전후를 타인 경계로 보고 더 공격적으로 정규화합니다.
+  const minDistance = 0.2;
+  const maxDistance = 0.6;
+  const normalized = 1 - (distance - minDistance) / (maxDistance - minDistance);
+  const similarity = Math.min(1, Math.max(0, normalized));
+
+  // 타인으로 판단되는 거리에서는 유사도를 강하게 깎습니다.
+  if (distance >= 0.68) {
+    return 0;
+  }
+  if (distance >= 0.6) {
+    return Math.min(similarity, 0.05);
+  }
+  if (distance >= 0.5) {
+    return Math.min(similarity, 0.15);
+  }
+  if (distance >= 0.45) {
+    return Math.min(similarity, 0.1);
+  }
+
+  return similarity;
+}
+
+/**
  * 두 얼굴 랜드마크의 전체 유사도를 계산합니다.
  */
 export function calculateSimilarity(
   landmarks1: FaceLandmarks,
-  landmarks2: FaceLandmarks
+  landmarks2: FaceLandmarks,
+  descriptor1?: Float32Array,
+  descriptor2?: Float32Array
 ): number {
   const facialFeaturesSim = calculateFacialFeaturesSimilarity(landmarks1, landmarks2);
   const contourSim = calculateFaceContourSimilarity(landmarks1, landmarks2);
@@ -168,5 +226,14 @@ export function calculateSimilarity(
     eyeSizeSim * 0.25 +
     noseSizeSim * 0.2;
 
-  return Math.min(1, Math.max(0, weightedSimilarity));
+  const landmarkSimilarity = Math.min(1, Math.max(0, weightedSimilarity));
+  const descriptorSimilarity = calculateDescriptorSimilarity(descriptor1, descriptor2);
+
+  // descriptor가 있으면 동일인 여부를 더 강하게 반영합니다.
+  if (descriptorSimilarity !== null) {
+    const blendedSimilarity = landmarkSimilarity * 0.15 + descriptorSimilarity * 0.85;
+    return Math.min(1, Math.max(0, blendedSimilarity));
+  }
+
+  return landmarkSimilarity;
 }

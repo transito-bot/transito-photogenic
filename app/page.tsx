@@ -6,7 +6,7 @@ import CameraCapture from '@/components/CameraCapture';
 import ImageUpload from '@/components/ImageUpload';
 import ResultDisplay from '@/components/ResultDisplay';
 import { detectFaceFromImage, normalizeLandmarks } from '@/lib/face-api';
-import { calculateSimilarity } from '@/lib/similarity';
+import { calculateDescriptorDistance, calculateSimilarity } from '@/lib/similarity';
 import { detectFilters } from '@/lib/opencv';
 import { calculateSelfieScore } from '@/lib/score';
 import type { FaceDetection } from '@/lib/face-api';
@@ -73,13 +73,29 @@ export default function Home() {
       );
 
       // 유사도 계산
-      const similarity = calculateSimilarity(normalizedOriginal, normalizedEdited);
+      const descriptorDistance = calculateDescriptorDistance(
+        originalFaceResult.descriptor,
+        editedFaceResult.descriptor
+      );
+      const isDifferentPerson = descriptorDistance !== null && descriptorDistance >= 0.5;
+
+      const similarity = calculateSimilarity(
+        normalizedOriginal,
+        normalizedEdited,
+        originalFaceResult.descriptor,
+        editedFaceResult.descriptor
+      );
 
       // 필터 감지
-      const filterDetection = await detectFilters(editedFile);
+      const filterDetection = isDifferentPerson
+        ? { blurLevel: 0, smoothness: 0, filterScore: 0 }
+        : await detectFilters(editedFile);
 
       // 셀기꾼 지수 계산
-      const result = calculateSelfieScore(similarity, filterDetection);
+      const result = calculateSelfieScore(similarity, filterDetection, {
+        forceDifferentPerson: isDifferentPerson,
+        descriptorDistance,
+      });
 
       setOriginalFace(originalFaceResult);
       setEditedFace(editedFaceResult);
@@ -117,8 +133,9 @@ export default function Home() {
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
             셀기꾼 지수 측정기
           </h1>
-          <p className="text-gray-600">
-            즉석 셀카와 보정본을 비교하여 당신의 셀기꾼 지수를 확인해보세요!
+          <p className="text-black">
+            즉석 셀카와 보정본을 비교하여<br />
+            당신의 셀기꾼 지수를 확인해보세요!
           </p>
         </div>
 
@@ -128,24 +145,23 @@ export default function Home() {
           <div className="text-sm text-blue-800">
             <p className="font-semibold mb-1">개인정보 보호</p>
             <p>
-              모든 이미지 처리는 브라우저에서만 이루어지며, 서버에 저장되지 않습니다.
-              분석 후 이미지는 메모리에서 즉시 삭제됩니다.
+              사진은 서버에 저장되지 않습니다.
             </p>
           </div>
         </div>
 
         {/* 진행 단계 표시 */}
         {step < 4 && (
-          <div className="flex justify-center mb-8">
+          <div className="flex justify-center mb-8 text-black">
             <div className="flex items-center gap-2">
               {[1, 2, 3].map((s) => (
                 <div key={s} className="flex items-center">
                   <div
                     className={`
                       w-10 h-10 rounded-full flex items-center justify-center font-semibold
-                      ${step >= s
+                    ${step >= s
                         ? 'bg-blue-500 text-white'
-                        : 'bg-gray-200 text-gray-500'
+                        : 'bg-gray-200 text-black'
                       }
                     `}
                   >
@@ -153,7 +169,7 @@ export default function Home() {
                   </div>
                   {s < 3 && (
                     <ArrowRight
-                      className={`mx-2 ${step > s ? 'text-blue-500' : 'text-gray-300'}`}
+                      className={`mx-2 ${step > s ? 'text-blue-500' : 'text-black'}`}
                       size={20}
                     />
                   )}
@@ -166,11 +182,11 @@ export default function Home() {
         {/* Step 1: 카메라 촬영 */}
         {step === 1 && (
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center gap-3 mb-4">
               <Camera className="text-blue-500" size={24} />
-              <h2 className="text-2xl font-semibold">Step 1: 즉석 셀카 촬영</h2>
+              <h2 className="text-2xl font-semibold text-black">Step 1: 즉석 셀카 촬영</h2>
             </div>
-            <p className="text-gray-600 mb-6">
+            <p className="text-black mb-6">
               카메라로 보정 없는 즉석 셀카를 촬영해주세요. 밝은 곳에서 촬영하면 더 정확한 결과를 얻을 수 있습니다.
             </p>
             <CameraCapture onCapture={handleOriginalCapture} />
@@ -180,11 +196,11 @@ export default function Home() {
         {/* Step 2: 보정본 업로드 */}
         {step === 2 && (
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center gap-3 mb-4">
               <Upload className="text-blue-500" size={24} />
-              <h2 className="text-2xl font-semibold">Step 2: 보정본 업로드</h2>
+              <h2 className="text-2xl font-semibold text-black">Step 2: 보정본 업로드</h2>
             </div>
-            <p className="text-gray-600 mb-6">
+            <p className="text-black mb-6">
               갤러리에서 보정된 인생샷을 선택해주세요.
             </p>
             <ImageUpload onUpload={handleEditedUpload} />
@@ -194,7 +210,7 @@ export default function Home() {
                   if (originalImageUrl) URL.revokeObjectURL(originalImageUrl);
                   setStep(1);
                 }}
-                className="text-gray-500 hover:text-gray-700 underline text-sm"
+                className="text-black hover:text-black/80 underline text-sm"
               >
                 이전 단계로 돌아가기
               </button>
@@ -207,9 +223,10 @@ export default function Home() {
           <div className="bg-white rounded-lg shadow-lg p-12 text-center">
             <div className="flex flex-col items-center gap-4">
               <Sparkles className="text-blue-500 animate-pulse" size={64} />
-              <h2 className="text-2xl font-semibold">이미지 분석 중...</h2>
-              <p className="text-gray-600">
-                얼굴 랜드마크를 추출하고 유사도를 계산하고 있습니다.
+              <h2 className="text-2xl font-semibold text-black">이미지 분석 중...</h2>
+              <p className="text-black">
+                셀카와 사진을<br />
+                비교하는 중입니다.
               </p>
               {error && (
                 <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
@@ -231,7 +248,7 @@ export default function Home() {
           <div className="bg-white rounded-lg shadow-lg p-6">
             <div className="flex items-center gap-3 mb-6">
               <Sparkles className="text-blue-500" size={24} />
-              <h2 className="text-2xl font-semibold">Step 4: 결과 확인</h2>
+              <h2 className="text-2xl font-semibold text-black">Step 4: 결과 확인</h2>
             </div>
             <ResultDisplay
               scoreResult={scoreResult}
@@ -243,7 +260,7 @@ export default function Home() {
             <div className="mt-6 flex justify-center">
               <button
                 onClick={handleReset}
-                className="px-6 py-3 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors font-medium"
+                className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors font-medium"
               >
                 다시 측정하기
               </button>

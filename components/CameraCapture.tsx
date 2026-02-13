@@ -65,7 +65,12 @@ export default function CameraCapture({ onCapture, onCancel }: CameraCaptureProp
 
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    ctx.drawImage(video, 0, 0);
+    // 전면 카메라 좌우 반전을 보정해 원본 방향으로 저장
+    ctx.save();
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    ctx.restore();
 
     canvas.toBlob((blob) => {
       if (blob) {
@@ -120,7 +125,7 @@ export default function CameraCapture({ onCapture, onCancel }: CameraCaptureProp
         <div className="flex gap-3">
           <button
             onClick={retake}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors"
           >
             <RotateCcw size={20} />
             다시 촬영
@@ -157,7 +162,7 @@ export default function CameraCapture({ onCapture, onCancel }: CameraCaptureProp
               autoPlay
               playsInline
               muted
-              className="max-w-full max-h-96 rounded-lg shadow-lg bg-black"
+              className="max-w-full max-h-96 rounded-lg shadow-lg bg-black -scale-x-100"
             />
             {!isStreaming && (
               <div className="absolute inset-0 flex items-center justify-center bg-gray-900 rounded-lg">
@@ -179,20 +184,20 @@ export default function CameraCapture({ onCapture, onCancel }: CameraCaptureProp
             </button>
             <button
               onClick={handleCancel}
-              className="flex items-center gap-2 px-4 py-3 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-4 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors"
             >
               <X size={20} />
               취소
             </button>
           </div>
-          <p className="text-sm text-gray-500 text-center">
+          <p className="text-sm text-black text-center">
             밝은 곳에서 촬영하면 더 정확한 결과를 얻을 수 있습니다.
           </p>
         </>
       )}
       <button
         onClick={() => fileInputRef.current?.click()}
-        className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors"
+        className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-800 rounded-lg transition-colors"
       >
         <Upload size={20} />
         사진첩에서 업로드

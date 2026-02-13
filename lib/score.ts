@@ -1,6 +1,13 @@
 import { FilterDetection } from './opencv';
 
-export type Grade = 'honest' | 'manner' | 'alchemist' | 'cyber';
+export type Grade =
+  | 'range_0_20'
+  | 'range_21_35'
+  | 'range_36_47'
+  | 'range_48_61'
+  | 'range_62_75'
+  | 'range_76_85'
+  | 'range_86_100';
 
 export interface ScoreResult {
   score: number; // 0-100
@@ -10,47 +17,61 @@ export interface ScoreResult {
   filterBonus: number;
 }
 
-const GRADE_THRESHOLDS = {
-  honest: { min: 0, max: 20 },
-  manner: { min: 21, max: 50 },
-  alchemist: { min: 51, max: 80 },
-  cyber: { min: 81, max: 100 },
+interface ScoreOptions {
+  forceDifferentPerson?: boolean;
+  descriptorDistance?: number | null;
+}
+
+const GRADE_THRESHOLDS: Record<Grade, { min: number; max: number }> = {
+  range_0_20: { min: 0, max: 20 },
+  range_21_35: { min: 21, max: 35 },
+  range_36_47: { min: 36, max: 47 },
+  range_48_61: { min: 48, max: 61 },
+  range_62_75: { min: 62, max: 75 },
+  range_76_85: { min: 76, max: 85 },
+  range_86_100: { min: 86, max: 100 },
 };
 
-const GRADE_INFO: Record<Grade, { name: string; messages: string[] }> = {
-  honest: {
-    name: '정직한 시민',
-    messages: [
-      '무보정 장인! 당신의 자신감이 빛나네요 ✨',
-      '필터 없이도 충분히 아름다워요!',
-      '진짜 미인은 보정이 필요 없다는 걸 증명하셨네요 👏',
-    ],
+const GRADE_INFO: Record<Grade, { name: string; message: string }> = {
+  range_0_20: {
+    name: '진실의 직시',
+    message: '🥹 보정 좀 하세요. 너무 솔직해서 AI도 걱정 중입니다.',
   },
-  manner: {
-    name: '매너 있는 보정',
-    messages: [
-      '자기관리 끝판왕! 적당한 보정은 예의예요 😊',
-      '자연스러운 보정으로 더욱 빛나시네요',
-      '매너 있는 보정으로 자신감을 더하셨군요!',
-    ],
+  range_21_35: {
+    name: '보정 입문',
+    message: '👏 이 정도는 현대인의 미덕이죠! 어디가서 난 보정 안 해! 말해도 됩니다.',
   },
-  alchemist: {
-    name: '손가락 연금술사',
-    messages: [
-      '포토샵 장인! 손가락이 황금이네요 🏆',
-      '보정 기술이 정말 뛰어나세요!',
-      '이 정도면 프로 수준의 보정 실력이에요 👏',
-    ],
+  range_36_47: {
+    name: '프로의 손길',
+    message: '😏 딱 여기까지가 마지노선! 소개팅 상대도 첫눈에 알아볼 수 있어요',
   },
-  cyber: {
-    name: '사이버 가수 아담',
-    messages: [
-      '부모님도 못 알아보시겠어요! 완전히 다른 사람이네요 😱',
-      '이 정도면 사이버 펑크 세계의 주인공이에요!',
-      '보정의 극한을 보여주셨네요. 정말 인상적이에요!',
-    ],
+  range_48_61: {
+    name: '쌍꺼풀 추적',
+    message: '🗣️ 친구들은 당신이 보정빨이라 생각하고 있어요!',
+  },
+  range_62_75: {
+    name: 'Adobe 우수고객',
+    message: '🤥 혹시 인플루언서세요? 당신의 보정 실력 저도 학습하고 싶네요!',
+  },
+  range_76_85: {
+    name: '증명사진 갱신 불가',
+    message: '👮 공항 입국 심사대 통과 불가입니다.',
+  },
+  range_86_100: {
+    name: '형사수사 합격',
+    message: '🚨 사기죄로 고소당할 뻔.\n소개팅 상대가 경찰 신고를 고민 중이라\n변호사 선임 권유드립니다.',
   },
 };
+
+function getGradeByScore(score: number): Grade {
+  if (score <= 20) return 'range_0_20';
+  if (score <= 35) return 'range_21_35';
+  if (score <= 47) return 'range_36_47';
+  if (score <= 61) return 'range_48_61';
+  if (score <= 75) return 'range_62_75';
+  if (score <= 85) return 'range_76_85';
+  return 'range_86_100';
+}
 
 /**
  * 셀기꾼 지수를 계산합니다.
@@ -61,8 +82,22 @@ const GRADE_INFO: Record<Grade, { name: string; messages: string[] }> = {
  */
 export function calculateSelfieScore(
   similarity: number,
-  filterDetection: FilterDetection
+  filterDetection: FilterDetection,
+  options?: ScoreOptions
 ): ScoreResult {
+  if (options?.forceDifferentPerson) {
+    const distance = options.descriptorDistance ?? 0;
+    const score = distance >= 0.75 ? 100 : distance >= 0.65 ? 95 : distance >= 0.55 ? 90 : 85;
+    const grade = getGradeByScore(score);
+    return {
+      score,
+      grade,
+      gradeName: GRADE_INFO[grade].name,
+      message: GRADE_INFO[grade].message,
+      filterBonus: 0,
+    };
+  }
+
   // 기본 점수: 유사도가 낮을수록 (다를수록) 점수가 높음
   const baseScore = (1 - similarity) * 100;
 
@@ -72,26 +107,18 @@ export function calculateSelfieScore(
   
   // 최종 점수 (최대 100점)
   const finalScore = Math.min(100, Math.max(0, baseScore + filterBonus));
+  const roundedScore = Math.round(finalScore);
 
-  // 등급 결정
-  let grade: Grade = 'honest';
-  for (const [key, threshold] of Object.entries(GRADE_THRESHOLDS)) {
-    if (finalScore >= threshold.min && finalScore <= threshold.max) {
-      grade = key as Grade;
-      break;
-    }
-  }
+  // 요청 점수 구간 기준으로 등급 결정
+  const grade = getGradeByScore(roundedScore);
 
   const gradeInfo = GRADE_INFO[grade];
-  const randomMessage = gradeInfo.messages[
-    Math.floor(Math.random() * gradeInfo.messages.length)
-  ];
 
   return {
-    score: Math.round(finalScore),
+    score: roundedScore,
     grade,
     gradeName: gradeInfo.name,
-    message: randomMessage,
+    message: gradeInfo.message,
     filterBonus: Math.round(filterBonus),
   };
 }
@@ -101,8 +128,11 @@ export function calculateSelfieScore(
  */
 export function getScoreColor(score: number): string {
   if (score <= 20) return 'text-green-600';
-  if (score <= 50) return 'text-blue-600';
-  if (score <= 80) return 'text-yellow-600';
+  if (score <= 35) return 'text-emerald-600';
+  if (score <= 47) return 'text-sky-600';
+  if (score <= 61) return 'text-blue-600';
+  if (score <= 75) return 'text-yellow-600';
+  if (score <= 85) return 'text-orange-600';
   return 'text-red-600';
 }
 
@@ -111,13 +141,19 @@ export function getScoreColor(score: number): string {
  */
 export function getGradeBadgeColor(grade: Grade): string {
   switch (grade) {
-    case 'honest':
+    case 'range_0_20':
       return 'bg-green-100 text-green-800 border-green-300';
-    case 'manner':
+    case 'range_21_35':
+      return 'bg-emerald-100 text-emerald-800 border-emerald-300';
+    case 'range_36_47':
+      return 'bg-sky-100 text-sky-800 border-sky-300';
+    case 'range_48_61':
       return 'bg-blue-100 text-blue-800 border-blue-300';
-    case 'alchemist':
+    case 'range_62_75':
       return 'bg-yellow-100 text-yellow-800 border-yellow-300';
-    case 'cyber':
+    case 'range_76_85':
+      return 'bg-orange-100 text-orange-800 border-orange-300';
+    case 'range_86_100':
       return 'bg-red-100 text-red-800 border-red-300';
   }
 }
