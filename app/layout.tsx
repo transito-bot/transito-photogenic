@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/banner-main.jpg",
+        url: "/banner-main.jpeg",
         width: 1792,
         height: 1024,
         alt: "셀기꾼 지수 측정기 배너",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "셀기꾼 지수 측정기",
     description: "즉석 셀카와 보정본을 비교하여 셀기꾼 지수를 측정해보세요!",
-    images: ["/banner-main.jpg"],
+    images: ["/banner-main.jpeg"],
   },
   manifest: "/manifest.json",
   appleWebApp: {

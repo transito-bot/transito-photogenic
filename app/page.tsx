@@ -132,7 +132,7 @@ export default function Home() {
         <div className="mb-8">
           <div
             className="h-[220px] md:h-[320px] rounded-2xl border-2 border-white/80 shadow-lg bg-pink-100 bg-cover bg-center"
-            style={{ backgroundImage: "url('/banner-main.jpg')" }}
+            style={{ backgroundImage: "url('/banner-main.jpeg')" }}
             role="img"
             aria-label="셀기꾼 지수 측정기 배너 이미지"
           />
