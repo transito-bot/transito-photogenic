@@ -129,14 +129,22 @@ export default function Home() {
     <main className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* 헤더 */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            셀기꾼 지수 측정기
-          </h1>
-          <p className="text-black">
-            즉석 셀카와 보정본을 비교하여<br />
-            당신의 셀기꾼 지수를 확인해보세요!
-          </p>
+        <div className="mb-8">
+          <div
+            className="h-[220px] md:h-[320px] rounded-2xl border-2 border-white/80 shadow-lg bg-pink-100 bg-cover bg-center"
+            style={{ backgroundImage: "url('/banner-main.jpg')" }}
+            role="img"
+            aria-label="셀기꾼 지수 측정기 배너 이미지"
+          />
+          <div className="text-center mt-6">
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              셀기꾼 지수 측정기
+            </h1>
+            <p className="text-black">
+              즉석 셀카와 보정본을 비교하여<br />
+              당신의 셀기꾼 지수를 확인해보세요!
+            </p>
+          </div>
         </div>
 
         {/* 개인정보 보호 안내 */}
